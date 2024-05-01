@@ -2,7 +2,9 @@ class level_1 extends Phaser.Scenes {
     constructor(){
         super("level_1");
     }
-    preload(){}
+    preload(){
+        //Preload the images
+    }
     create(){}
     update(){}
 }
