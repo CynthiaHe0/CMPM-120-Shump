@@ -12,7 +12,7 @@ class Player_bullet_group extends Phaser.GameObjects.Group{
         this.cooldown = cooldown;
         this.counter = cooldown;
     }
-    update(playerX, playerY){
+    spawn(playerX, playerY){
         this.counter--;
         if (this.key.isDown){
             if (this.counter < 0){

@@ -46,10 +46,14 @@ class Level_1 extends Phaser.Scene {
         my.sprite.playerBullets.propertyValueSet("speed", this.playerBulletSpeed);
         my.sprite.playerBullets.add_trigger_n_cooldown(this.space, this.playerBulletCooldown);
         console.log(my.sprite.playerBullets);
+        
+        //THIS ONE LINE OF CODE MAKES THE ENTIRE CUSTOM GROUP WORK
+        //AND ALLOWS FOR CHILD UPDATES!!!!!
+        this.add.existing(my.sprite.playerBullets);
     }
     update(){
         let my = this.my;
-        my.sprite.playerBullets.update(my.sprite.player.x, my.sprite.player.y);
+        my.sprite.playerBullets.spawn(my.sprite.player.x, my.sprite.player.y);
         my.sprite.player.update();
     }
 }
