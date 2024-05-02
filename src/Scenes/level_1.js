@@ -45,7 +45,7 @@ class Level_1 extends Phaser.Scene {
         });
         my.sprite.playerBullets.propertyValueSet("speed", this.playerBulletSpeed);
         my.sprite.playerBullets.add_trigger_n_cooldown(this.space, this.playerBulletCooldown);
-        console.log(my.sprite.playerBullets);
+        my.sprite.playerBullets.setXY(-100, -100);
         
         //THIS ONE LINE OF CODE MAKES THE ENTIRE CUSTOM GROUP WORK
         //AND ALLOWS FOR CHILD UPDATES!!!!!

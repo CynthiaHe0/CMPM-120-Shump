@@ -21,6 +21,8 @@ class Player_bullet extends Phaser.GameObjects.Sprite {
     makeInactive() {
         this.visible = false;
         this.active = false;
+        this.x = -100;
+        this.y = -100;
     }
 
 }
