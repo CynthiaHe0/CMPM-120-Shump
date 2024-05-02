@@ -4,6 +4,7 @@ class Level_1 extends Phaser.Scene {
         this.my = {sprite: {}};
         this.playerSpeed = 5;
         this.playerBulletSpeed = 5;
+        this.playerBulletCooldown = 5;
     }
     preload(){
         //Preload the images
@@ -43,7 +44,7 @@ class Level_1 extends Phaser.Scene {
             repeat: my.sprite.playerBullets.maxSize-1
         });
         my.sprite.playerBullets.propertyValueSet("speed", this.playerBulletSpeed);
-        my.sprite.playerBullets.add_trigger_key(this.space);
+        my.sprite.playerBullets.add_trigger_n_cooldown(this.space, this.playerBulletCooldown);
         console.log(my.sprite.playerBullets);
     }
     update(){
