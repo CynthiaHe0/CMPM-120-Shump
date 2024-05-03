@@ -1,4 +1,4 @@
-class Player_bullet extends Phaser.GameObjects.Sprite {
+class Crystal_bullet extends Phaser.GameObjects.Sprite{
     constructor(scene, x, y, texture, frame) {        
         super(scene, x, y, texture, frame);
         this.visible = false;
@@ -7,7 +7,7 @@ class Player_bullet extends Phaser.GameObjects.Sprite {
     }
     update() {
         if (this.active) {
-            this.y -= this.speed;
+            this.y += this.speed;
             if (this.y < -(this.displayHeight/2)) {
                 this.makeInactive();
             }
