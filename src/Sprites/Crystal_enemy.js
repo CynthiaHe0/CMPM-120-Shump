@@ -15,7 +15,6 @@ class Crystal_enemy extends Phaser.GameObjects.PathFollower {
         this.startFollow({
             delay: 0,
             duration: 6000,
-            ease: "Sine.EaseInOut",
             repeat: -1,
             yoyo: false
         });

@@ -72,10 +72,20 @@ class Level_1 extends Phaser.Scene {
             150, this.crystal_y,
             50, my.sprite.player.y - 70,
         ]);
+        
         for (let i = 0; i < 5; i ++){
             let copy = Phaser.Utils.Objects.DeepCopy(crystal_path);
+            let h = 4;
+            for(let j = 0; j < 5; j++){
+                if (j > i){
+                    copy.points.unshift({x: 70 + h*160, y:this.crystal_y});
+                    h--;
+                } else if (j < i){
+                    copy.points.push({x: 70 + j*160, y:this.crystal_y});
+                }
+            }
             copy.points.push({x: 70 + i*160, y:this.crystal_y});
-            copy.points.unshift({x: 70 + i*160, y:this.crystal_y});
+            copy.points.unshift({x: 70 + i*160, y:this.crystal_y}); 
             let follower = new Crystal_enemy(
                 this,
                 copy,
@@ -86,7 +96,6 @@ class Level_1 extends Phaser.Scene {
             follower.setScale(0.5);
             my.sprite.crystal_enemies.add(follower, true);
             follower.makeActive();
-            //console.log(follower);
         }
         console.log(my.sprite.crystal_enemies);
         
