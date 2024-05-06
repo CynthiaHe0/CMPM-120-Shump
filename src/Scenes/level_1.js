@@ -62,7 +62,34 @@ class Level_1 extends Phaser.Scene {
             runChildUpdate: true
             }
         );
-        my.sprite.crystal_enemies.createMultiple({
+        let crystal_path = new Phaser.Curves.Spline([
+            920, this.crystal_y,
+            820, my.sprite.player.y - 50,
+            720, this.crystal_y,
+            620, my.sprite.player.y - 50,
+            520, this.crystal_y,
+            420, my.sprite.player.y - 50,
+            320, this.crystal_y,
+            220, my.sprite.player.y - 50,
+            120, this.crystal_y,
+
+        ]);
+        for (let i = 0; i < 5; i ++){
+            let follower = new Crystal_enemy(
+                this,
+                crystal_path,
+                70+ i*160,
+                this.crystal_y,
+                "crystal_enemy"
+            );
+            follower.setScale(0.5);
+            my.sprite.crystal_enemies.add(follower, true);
+            follower.makeActive();
+            //console.log(follower);
+        }
+        console.log(my.sprite.crystal_enemies);
+        
+        /*my.sprite.crystal_enemies.createMultiple({
             classType: Crystal_enemy,
             active: false,
             key: my.sprite.crystal_enemies.defaultKey,
@@ -74,20 +101,8 @@ class Level_1 extends Phaser.Scene {
             },
             setScale: {x: 0.5, y: 0.5}
         });
-        let crystal_path = new Phaser.Curves.Spline([
-            820, this.crystal_y,
-            970, 313,
-            808, 539,
-            614, 410,
-            509, 580,
-            304, 414,
-            160, 558,
-            25,  306,
-            150, this.crystal_y,
-
-        ]);
         my.sprite.crystal_enemies.propertyValueSet("path", crystal_path);
-        
+        */
         /*my.sprite.crystal_bullets = this.add.group({
             active: true,
             defaultKey: "ice",
