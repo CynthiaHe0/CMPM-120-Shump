@@ -63,22 +63,23 @@ class Level_1 extends Phaser.Scene {
             }
         );
         let crystal_path = new Phaser.Curves.Spline([
-            920, this.crystal_y,
-            820, my.sprite.player.y - 50,
-            720, this.crystal_y,
-            620, my.sprite.player.y - 50,
-            520, this.crystal_y,
-            420, my.sprite.player.y - 50,
-            320, this.crystal_y,
-            220, my.sprite.player.y - 50,
-            120, this.crystal_y,
-
+            750, this.crystal_y,
+            650, my.sprite.player.y - 70,
+            550, this.crystal_y,
+            450, my.sprite.player.y - 70,
+            350, this.crystal_y,
+            250, my.sprite.player.y - 70,
+            150, this.crystal_y,
+            50, my.sprite.player.y - 70,
         ]);
         for (let i = 0; i < 5; i ++){
+            let copy = Phaser.Utils.Objects.DeepCopy(crystal_path);
+            copy.points.push({x: 70 + i*160, y:this.crystal_y});
+            copy.points.unshift({x: 70 + i*160, y:this.crystal_y});
             let follower = new Crystal_enemy(
                 this,
-                crystal_path,
-                70+ i*160,
+                copy,
+                70 + i*160,
                 this.crystal_y,
                 "crystal_enemy"
             );

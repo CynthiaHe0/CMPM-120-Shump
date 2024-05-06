@@ -9,11 +9,13 @@ class Crystal_enemy extends Phaser.GameObjects.PathFollower {
     makeActive() {
         this.visible = true;
         this.active = true;
-        //this.path
+        //this.path.points.push({x: this.x, y: this.y});
+        //this.path.points.unshift({x: this.x, y: this.y});
+        console.log(this.path);
         this.startFollow({
             delay: 0,
-            duration: 2000,
-            ease: 'Sine.easeInOut',
+            duration: 6000,
+            ease: "Sine.EaseInOut",
             repeat: -1,
             yoyo: false
         });
