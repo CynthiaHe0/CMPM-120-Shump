@@ -127,5 +127,20 @@ class Level_1 extends Phaser.Scene {
         let my = this.my;
         my.sprite.playerBullets.spawn(my.sprite.player.x, my.sprite.player.y);
         my.sprite.player.update();
+        for (let bullet of my.sprite.playerBullets.getChildren()){
+            if (bullet.active){
+                for (let enemy of my.sprite.crystal_enemies.getChildren()){
+                    if (this.collides(bullet, enemy)){
+                        bullet.makeInactive();
+                        enemy.makeInactive();
+                    }
+                }
+            }
+        }
+    }
+    collides(a, b) {
+        if (Math.abs(a.x - b.x) > (a.displayWidth/2 + b.displayWidth/2)) return false;
+        if (Math.abs(a.y - b.y) > (a.displayHeight/2 + b.displayHeight/2)) return false;
+        return true;
     }
 }
