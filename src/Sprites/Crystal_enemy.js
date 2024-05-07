@@ -3,6 +3,8 @@ class Crystal_enemy extends Phaser.GameObjects.PathFollower {
         super(scene, path, x, y, texture, frame);
         this.visible = false;
         this.active = false;
+        this.shoot = false;
+        this.timedEvent = new Phaser.Time.TimerEvent({delay: 500, callback: this.shootTime(), loop: true});
         console.log("Crystal enemy created");
         return this;   
     }
@@ -20,7 +22,11 @@ class Crystal_enemy extends Phaser.GameObjects.PathFollower {
         });
         
     }
-
+    shootTime(){
+        this.shoot = true;
+        console.log("Time to shoot!");
+        //this.timedEvent = new Phaser.Time.TimerEvent({delay: 1000, callback: this.timerReset()});
+    }
     makeInactive() {
         this.visible = false;
         this.active = false;

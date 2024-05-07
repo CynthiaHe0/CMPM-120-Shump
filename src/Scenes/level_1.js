@@ -2,9 +2,9 @@ class Level_1 extends Phaser.Scene {
     constructor(){
         super("level_1");
         this.my = {sprite: {}};
-        this.playerSpeed = 5;
-        this.playerBulletSpeed = 5;
-        this.playerBulletCooldown = 5;
+        this.playerSpeed = 8;
+        this.playerBulletSpeed = 10;
+        this.playerBulletCooldown = 10;
 
         this.enemyBulletSpeed = 10;
         this.crystal_y = 190;
@@ -35,7 +35,7 @@ class Level_1 extends Phaser.Scene {
         my.sprite.playerBullets = new Player_bullet_group(this, {
             active: true,
             defaultKey: "fireball",
-            maxSize: 10,
+            maxSize: 5,
             runChildUpdate: true
             }
         );
@@ -99,29 +99,21 @@ class Level_1 extends Phaser.Scene {
         }
         console.log(my.sprite.crystal_enemies);
         
-        /*my.sprite.crystal_enemies.createMultiple({
-            classType: Crystal_enemy,
-            active: false,
-            key: my.sprite.crystal_enemies.defaultKey,
-            repeat: my.sprite.crystal_enemies.maxSize-1,
-            setXY: {
-                x : 70,
-                y : this.crystal_y,
-                stepX: 160
-            },
-            setScale: {x: 0.5, y: 0.5}
-        });
-        my.sprite.crystal_enemies.propertyValueSet("path", crystal_path);
-        */
-        /*my.sprite.crystal_bullets = this.add.group({
+        my.sprite.ice_bullets = this.add.group({
             active: true,
             defaultKey: "ice",
             maxSize: 20,
             runChildUpdate: true
             }
         );
-        my.sprite.crystal_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
-        */
+        my.sprite.ice_bullets.createMultiple({
+            classType: Ice_bullet,
+            active: false,
+            key: my.sprite.ice_bullets.defaultKey,
+            repeat: my.sprite.ice_bullets.maxSize-1
+        });
+        my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
+        my.sprite.ice_bullets.setXY(-100, -100);
     }
     update(){
         let my = this.my;
@@ -129,7 +121,7 @@ class Level_1 extends Phaser.Scene {
         my.sprite.player.update();
         for (let bullet of my.sprite.playerBullets.getChildren()){
             if (bullet.active){
-                let hit = this.enemy_shot(bullet, my.sprite.crystal_enemies);
+                let hit = this.check_hit_enemy(bullet, my.sprite.crystal_enemies);
                 if (hit == null){
                     console.log("Bullet still flying");
                     //this.enemy_shot(bullet, my.sprite.crystal_enemies);
@@ -137,8 +129,17 @@ class Level_1 extends Phaser.Scene {
                 }
             }
         }
+        for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
+            if (ice_enemy.active == true && ice_enemy.shoot == true){
+                let ice_bullet = my.sprite.ice_bullets.getFirstDead();
+                if (ice_bullet != null){
+                    ice_bullet.makeActive(ice_enemy.x, ice_enemy.y);
+                }
+                ice_enemy.shoot = false;
+            }
+        }
     }
-    enemy_shot(bullet, enemygroup){
+    check_hit_enemy(bullet, enemygroup){
         for (let enemy of enemygroup.getChildren()){
             if (this.collides(bullet, enemy)){
                 bullet.makeInactive();

@@ -3,6 +3,7 @@ class Player_bullet extends Phaser.GameObjects.Sprite {
         super(scene, x, y, texture, frame);
         this.visible = false;
         this.active = false;
+        this.setScale(0.75);
         return this;
     }
     update() {
@@ -15,7 +16,7 @@ class Player_bullet extends Phaser.GameObjects.Sprite {
     }
     makeActive() {
         this.visible = true;
-        this.active = true;
+        this.active = true; 
     }
 
     makeInactive() {
