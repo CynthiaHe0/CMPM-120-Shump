@@ -129,14 +129,24 @@ class Level_1 extends Phaser.Scene {
         my.sprite.player.update();
         for (let bullet of my.sprite.playerBullets.getChildren()){
             if (bullet.active){
-                for (let enemy of my.sprite.crystal_enemies.getChildren()){
-                    if (this.collides(bullet, enemy)){
-                        bullet.makeInactive();
-                        enemy.makeInactive();
-                    }
+                let hit = this.enemy_shot(bullet, my.sprite.crystal_enemies);
+                if (hit == null){
+                    console.log("Bullet still flying");
+                    //this.enemy_shot(bullet, my.sprite.crystal_enemies);
+                    //Now check to see if it hit the clouds
                 }
             }
         }
+    }
+    enemy_shot(bullet, enemygroup){
+        for (let enemy of enemygroup.getChildren()){
+            if (this.collides(bullet, enemy)){
+                bullet.makeInactive();
+                enemy.makeInactive();
+                return enemy;
+            }
+        }
+        return null;
     }
     collides(a, b) {
         if (Math.abs(a.x - b.x) > (a.displayWidth/2 + b.displayWidth/2)) return false;
