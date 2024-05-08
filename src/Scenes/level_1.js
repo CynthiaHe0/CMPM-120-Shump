@@ -10,6 +10,7 @@ class Level_1 extends Phaser.Scene {
         this.iceBulletCooldown = 60;
         this.iceCounter = 0;
         this.crystal_y = 190;
+        this.playerHealth = 6;
     }
     preload(){
         //Preload the images
@@ -20,6 +21,9 @@ class Level_1 extends Phaser.Scene {
         this.load.image("crystal_enemy", "Ice_crystal.png");
         this.load.image("fireball", "flame.png");
         this.load.image("ice", "laserBlue10.png");
+        this.load.image("heart", "heart.png");
+        this.load.image("halfheart", "halfheart.png");
+        this.load.image("emptyheart", "emptyheart.png")
     }
     create(){
         let my = this.my;
@@ -29,6 +33,34 @@ class Level_1 extends Phaser.Scene {
         this.left2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         this.right2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        my.sprite.heart1_full = this.add.image(40, 30,"heart");
+        my.sprite.heart1_full.setScale(2);
+        my.sprite.heart2_full = this.add.image(100, 30,"heart");
+        my.sprite.heart2_full.setScale(2);
+        my.sprite.heart3_full = this.add.image(160, 30,"heart");
+        my.sprite.heart3_full.setScale(2);
+
+        my.sprite.heart1_half = this.add.image(40, 30, "halfheart");
+        my.sprite.heart1_half.setScale(2);
+        my.sprite.heart1_half.visible = false;
+        my.sprite.heart2_half = this.add.image(100, 30, "halfheart");
+        my.sprite.heart2_half.setScale(2);
+        my.sprite.heart2_half.visible = false;
+        my.sprite.heart3_half = this.add.image(160, 30, "halfheart");
+        my.sprite.heart3_half.setScale(2);
+        my.sprite.heart3_half.visible = false;
+
+        my.sprite.heart1_empty = this.add.image(40, 30, "emptyheart");
+        my.sprite.heart1_empty.setScale(2);
+        my.sprite.heart1_empty.visible = false;
+        my.sprite.heart2_empty = this.add.image(100, 30, "emptyheart");
+        my.sprite.heart2_empty.setScale(2);
+        my.sprite.heart2_empty.visible = false;
+        my.sprite.heart3_empty = this.add.image(160, 30, "emptyheart");
+        my.sprite.heart3_empty.setScale(2);
+        my.sprite.heart3_empty.visible = false;
+
 
         my.sprite.player = new Player(this, game.config.width/2, game.config.height - 40, "player", null,
         [this.left1, this.left2], [this.right1, this.right2], this.playerSpeed);
@@ -132,6 +164,15 @@ class Level_1 extends Phaser.Scene {
                 }
             }
         }
+        for (let bullet of my.sprite.ice_bullets.getChildren()){
+            if (bullet.active){
+                if (this.collides(bullet, my.sprite.player)){
+                    bullet.makeInactive();
+                    this.playerHealth--;
+                    console.log("Lost 1 health");
+                }
+            }
+        }
         if (this.iceCounter >= this.iceBulletCooldown){
             for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
                 if (ice_enemy.active == true){
@@ -145,6 +186,39 @@ class Level_1 extends Phaser.Scene {
             this.iceCounter = 0;
         }
         this.iceCounter++;
+        if (this.playerHealth < 1){
+            console.log("You ded now")
+            //this.pause()
+        } else{
+            switch(this.playerHealth){
+                case 5:
+                    my.sprite.heart1_full.visible = false;
+                    my.sprite.heart1_half.visible = true;
+                    break;
+                case 4:
+                    my.sprite.heart1_half.visible = false;
+                    my.sprite.heart1_empty.visible = true;
+                    break;
+                case 3:
+                    my.sprite.heart2_full.visible = false;
+                    my.sprite.heart2_half.visible = true;
+                    break;
+                case 2:
+                    my.sprite.heart2_half.visible = false;
+                    my.sprite.heart2_empty.visible = true;
+                    break;
+                case 1:
+                    my.sprite.heart3_full.visible = false;
+                    my.sprite.heart3_half.visible = true;
+                    break;
+                case 0:
+                    my.sprite.heart3_half.visible = false;
+                    my.sprite.heart3_empty.visible = true;
+                    break;
+                default:
+                    console.log("You full health (i think)");
+            }
+        }
     }
     check_hit_enemy(bullet, enemygroup){
         for (let enemy of enemygroup.getChildren()){
