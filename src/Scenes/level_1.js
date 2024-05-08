@@ -7,6 +7,8 @@ class Level_1 extends Phaser.Scene {
         this.playerBulletCooldown = 10;
 
         this.enemyBulletSpeed = 10;
+        this.iceBulletCooldown = 60;
+        this.iceCounter = 0;
         this.crystal_y = 190;
     }
     preload(){
@@ -114,6 +116,7 @@ class Level_1 extends Phaser.Scene {
         });
         my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
         my.sprite.ice_bullets.setXY(-100, -100);
+        //this.ice_timer = this.time.addEvent({delay: 500, callback: this.ice_shoot(), callbackScope: this, loop: true});
     }
     update(){
         let my = this.my;
@@ -129,15 +132,19 @@ class Level_1 extends Phaser.Scene {
                 }
             }
         }
-        for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
-            if (ice_enemy.active == true && ice_enemy.shoot == true){
-                let ice_bullet = my.sprite.ice_bullets.getFirstDead();
-                if (ice_bullet != null){
-                    ice_bullet.makeActive(ice_enemy.x, ice_enemy.y);
+        if (this.iceCounter >= this.iceBulletCooldown){
+            for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
+                if (ice_enemy.active == true){
+                    let ice_bullet = my.sprite.ice_bullets.getFirstDead();
+                    if (ice_bullet != null){
+                        ice_bullet.makeActive(ice_enemy.x, ice_enemy.y);
+                    }
+                    ice_enemy.shoot = false;
                 }
-                ice_enemy.shoot = false;
             }
+            this.iceCounter = 0;
         }
+        this.iceCounter++;
     }
     check_hit_enemy(bullet, enemygroup){
         for (let enemy of enemygroup.getChildren()){
