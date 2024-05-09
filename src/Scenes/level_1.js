@@ -10,6 +10,7 @@ class Level_1 extends Phaser.Scene {
         this.iceBulletCooldown = 60;
         this.iceCounter = 0;
         this.crystal_y = 190;
+        this.cloud_y = 80;
         this.playerHealth = 6;
     }
     preload(){
@@ -25,6 +26,10 @@ class Level_1 extends Phaser.Scene {
         this.load.image("halfheart", "halfheart.png");
         this.load.image("emptyheart", "emptyheart.png");
         this.load.bitmapFont('text', 'bitmapfont_0.png', 'bitmapfont.xml');
+    
+        this.load.image("star1", "star1.png");
+        this.load.image("star2", "star2.png");
+        this.load.image("star3", "star3.png");
     }
     create(){
         let my = this.my;
@@ -89,7 +94,7 @@ class Level_1 extends Phaser.Scene {
         this.add.existing(my.sprite.playerBullets);
 
         //================================================
-        //  Start of enemy setup
+        //  Start of ice crystal enemy setup
         my.sprite.crystal_enemies = this.add.group({
             active: true,
             defaultKey: "crystal_enemy",
@@ -146,6 +151,82 @@ class Level_1 extends Phaser.Scene {
             active: false,
             key: my.sprite.ice_bullets.defaultKey,
             repeat: my.sprite.ice_bullets.maxSize-1
+        });
+        my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
+        my.sprite.ice_bullets.setXY(-100, -100);
+
+        this.anims.create({
+            key: "poof",
+            frames: [
+                { key: "star1" },
+                { key: "star2" },
+                { key: "star1" },
+                { key: "star2" },
+                { key: "star3" },
+                { key: "star3" },
+            ],
+            framerate: 5,
+            repeat: 0,
+            hideOnComplete: true
+        });
+        //======================================================
+        // Cloud enemy setup
+        my.sprite.cloud_enemies = this.add.group({
+            active: true,
+            defaultKey: "cloud_enemy",
+            maxSize: 5,
+            runChildUpdate: true
+            }
+        );
+
+        let cloud_path = new Phaser.Curves.Spline([
+            750, this.cloud_y,
+            650, this.cloud_y,
+            550, this.cloud_y,
+            450, this.cloud_y,
+            350, this.cloud_y,
+            250, this.cloud_y,
+            150, this.cloud_y,
+            50,  this.cloud_y,
+        ]);
+
+        for (let i = 0; i < 5; i ++){
+            let copy = Phaser.Utils.Objects.DeepCopy(cloud_path);
+            let h = 4;
+            for(let j = 0; j < 5; j++){
+                if (j > i){
+                    copy.points.unshift({x: 70 + h*160, y:this.cloud_y});
+                    h--;
+                } else if (j < i){
+                    copy.points.push({x: 70 + j*160, y:this.cloud_y});
+                }
+            }
+            copy.points.push({x: 70 + i*160, y:this.cloud_y});
+            copy.points.unshift({x: 70 + i*160, y:this.cloud_y}); 
+            let follower = new Cloud_enemy(
+                this,
+                copy,
+                70 + i*160,
+                this.cloud_y,
+                "cloud_enemy"
+            );
+            follower.setScale(0.5);
+            my.sprite.crystal_enemies.add(follower, true);
+            follower.makeActive();
+        }
+
+        my.sprite.cloud_lightning = this.add.group({
+            active: true,
+            defaultKey: "lightning",
+            maxSize: 10,
+            runChildUpdate: true
+            }
+        );
+        my.sprite.cloud_lightning.createMultiple({
+            classType: Ice_bullet,
+            active: false,
+            key: my.sprite.cloud_lightning.defaultKey,
+            repeat: my.sprite.cloud_lightning.maxSize-1
         });
         my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
         my.sprite.ice_bullets.setXY(-100, -100);
@@ -247,6 +328,9 @@ class Level_1 extends Phaser.Scene {
     check_hit_enemy(bullet, enemygroup){
         for (let enemy of enemygroup.getChildren()){
             if (this.collides(bullet, enemy)){
+                this.poof1 = this.add.sprite(enemy.x - 10, enemy.y - 10, "star2").play("poof");
+                this.poof2 = this.add.sprite(enemy.x + 10, enemy.y, "star2").play("poof");
+                this.poof3 = this.add.sprite(enemy.x, enemy.y + 10, "star2").play("poof");
                 bullet.makeInactive();
                 enemy.makeInactive();
                 return enemy;
