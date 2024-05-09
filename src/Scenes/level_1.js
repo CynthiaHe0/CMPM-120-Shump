@@ -157,7 +157,9 @@ class Level_1 extends Phaser.Scene {
         this.restartText.visible = false;
         this.restartKey = this.input.keyboard.addKey("R");
         this.restartKey.on('down', (key, event) => {
-            this.reset();
+            if (this.playerHealth < 1){
+                this.reset();
+            }
         })
     }
     update(){   
