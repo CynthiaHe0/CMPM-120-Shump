@@ -18,10 +18,6 @@ class Crystal_enemy extends Phaser.GameObjects.PathFollower {
             yoyo: false
         });
     }
-    /*shootTime(){
-        this.shoot = true;
-        console.log("Time to shoot!");
-    }*/
     makeInactive() {
         this.visible = false;
         this.active = false;

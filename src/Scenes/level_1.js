@@ -23,7 +23,8 @@ class Level_1 extends Phaser.Scene {
         this.load.image("ice", "laserBlue10.png");
         this.load.image("heart", "heart.png");
         this.load.image("halfheart", "halfheart.png");
-        this.load.image("emptyheart", "emptyheart.png")
+        this.load.image("emptyheart", "emptyheart.png");
+        this.load.bitmapFont('text', 'bitmapfont_0.png', 'bitmapfont.xml');
     }
     create(){
         let my = this.my;
@@ -148,46 +149,29 @@ class Level_1 extends Phaser.Scene {
         });
         my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
         my.sprite.ice_bullets.setXY(-100, -100);
-        //this.ice_timer = this.time.addEvent({delay: 500, callback: this.ice_shoot(), callbackScope: this, loop: true});
+        //======================================================
+        // Game over text
+        this.gameOver = this.add.bitmapText(game.config.width/2, game.config.height/2, 'text', 'Game Over', 32).setOrigin(0.5);
+        this.gameOver.visible = false;
+        this.restartText = this.add.bitmapText(game.config.width/2, (game.config.height/2) + 20, 'text', 'Press R to restart', 32).setOrigin(0.5);
+        this.restartText.visible = false;
+        this.restartKey = this.input.keyboard.addKey("R");
+        this.restartKey.on('down', (key, event) => {
+            this.reset();
+        })
     }
-    update(){
+    update(){   
         let my = this.my;
-        my.sprite.playerBullets.spawn(my.sprite.player.x, my.sprite.player.y);
-        my.sprite.player.update();
-        for (let bullet of my.sprite.playerBullets.getChildren()){
-            if (bullet.active){
-                let hit = this.check_hit_enemy(bullet, my.sprite.crystal_enemies);
-                if (hit == null){
-                    console.log("Bullet still flying");
-                    //this.enemy_shot(bullet, my.sprite.crystal_enemies);
-                    //Now check to see if it hit the clouds
-                }
-            }
-        }
-        for (let bullet of my.sprite.ice_bullets.getChildren()){
-            if (bullet.active){
-                if (this.collides(bullet, my.sprite.player)){
-                    bullet.makeInactive();
-                    this.playerHealth--;
-                    console.log("Lost 1 health");
-                }
-            }
-        }
-        if (this.iceCounter >= this.iceBulletCooldown){
-            for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
-                if (ice_enemy.active == true){
-                    let ice_bullet = my.sprite.ice_bullets.getFirstDead();
-                    if (ice_bullet != null){
-                        ice_bullet.makeActive(ice_enemy.x, ice_enemy.y);
-                    }
-                    ice_enemy.shoot = false;
-                }
-            }
-            this.iceCounter = 0;
-        }
-        this.iceCounter++;
         if (this.playerHealth < 1){
-            console.log("You ded now")
+            my.sprite.heart3_half.visible = false;
+            my.sprite.heart3_empty.visible = true;
+            for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
+                ice_enemy.makeInactive();
+            }
+            //Maybe play animation of sun exploding
+            this.gameOver.visible = true;
+            this.restartText.visible = true;
+            console.log("You ded now");
             //this.pause()
         } else{
             switch(this.playerHealth){
@@ -211,13 +195,51 @@ class Level_1 extends Phaser.Scene {
                     my.sprite.heart3_full.visible = false;
                     my.sprite.heart3_half.visible = true;
                     break;
-                case 0:
-                    my.sprite.heart3_half.visible = false;
-                    my.sprite.heart3_empty.visible = true;
-                    break;
                 default:
                     console.log("You full health (i think)");
             }
+            //Spawn bullets where the player presses space
+            my.sprite.playerBullets.spawn(my.sprite.player.x, my.sprite.player.y);
+            //Allow the player to move left or right
+            my.sprite.player.update();
+            
+            //Check to see if the player bullet hit any enemies
+            for (let bullet of my.sprite.playerBullets.getChildren()){
+                if (bullet.active){
+                    let hit = this.check_hit_enemy(bullet, my.sprite.crystal_enemies);
+                    if (hit == null){
+                        console.log("Bullet still flying");
+                        //this.enemy_shot(bullet, my.sprite.crystal_enemies);
+                        //Now check to see if it hit the clouds
+                    }
+                }
+            }
+
+            //Check to see if any of the ice bullets hit the player
+            for (let bullet of my.sprite.ice_bullets.getChildren()){
+                if (bullet.active){
+                    if (this.collides(bullet, my.sprite.player)){
+                        bullet.makeInactive();
+                        this.playerHealth--;
+                        console.log("Lost 1 health");
+                    }
+                }
+            }
+
+            //Have the ice enemies shoot bullets at a set interval of time
+            if (this.iceCounter >= this.iceBulletCooldown){
+                for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
+                    if (ice_enemy.active == true){
+                        let ice_bullet = my.sprite.ice_bullets.getFirstDead();
+                        if (ice_bullet != null){
+                            ice_bullet.makeActive(ice_enemy.x, ice_enemy.y);
+                        }
+                        ice_enemy.shoot = false;
+                    }
+                }
+             this.iceCounter = 0;
+            }
+            this.iceCounter++;
         }
     }
     check_hit_enemy(bullet, enemygroup){
@@ -234,5 +256,23 @@ class Level_1 extends Phaser.Scene {
         if (Math.abs(a.x - b.x) > (a.displayWidth/2 + b.displayWidth/2)) return false;
         if (Math.abs(a.y - b.y) > (a.displayHeight/2 + b.displayHeight/2)) return false;
         return true;
+    }
+    reset(){
+        let i = 0;
+        for (let ice_enemy of this.my.sprite.crystal_enemies.getChildren()){
+            ice_enemy.x = 70 + i*160;
+            ice_enemy.y = this.crystal_y;
+            ice_enemy.makeActive();
+            i++;
+        }
+        this.my.sprite.heart1_full.visible = true;
+        this.my.sprite.heart1_empty.visible = false;
+        this.my.sprite.heart2_full.visible = true;
+        this.my.sprite.heart2_empty.visible = false;
+        this.my.sprite.heart3_full.visible = true;
+        this.my.sprite.heart3_empty.visible = false;
+        this.gameOver.visible = false;
+        this.restartText.visible = false;
+        this.playerHealth = 6;
     }
 }

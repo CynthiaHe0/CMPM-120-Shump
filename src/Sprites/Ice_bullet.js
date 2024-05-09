@@ -10,7 +10,7 @@ class Ice_bullet extends Phaser.GameObjects.Sprite{
         if (this.active) {
             this.y += this.speed;
             //Need to find a way to give it the max y range of screen
-            if (this.y > 800) {
+            if (this.y > game.config.height) {
                 this.makeInactive();
             }
         }
