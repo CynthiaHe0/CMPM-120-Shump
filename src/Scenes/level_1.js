@@ -12,6 +12,7 @@ class Level_1 extends Phaser.Scene {
         this.crystal_y = 190;
         this.cloud_y = 80;
         this.playerHealth = 6;
+        this.godMode = false;
     }
     preload(){
         //Preload the images
@@ -39,6 +40,15 @@ class Level_1 extends Phaser.Scene {
         this.left2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         this.right2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.toggleGodMode = this.input.keyboard.addKey("G");
+        this.toggleGodMode.on('down', (key, event) => {
+            this.godMode = !(this.godMode);
+            if (this.godMode){
+                console.log("God mode active");
+            } else {
+                console.log("God mode deactivated");
+            }
+        });
 
         my.sprite.heart1_full = this.add.image(40, 30,"heart");
         my.sprite.heart1_full.setScale(2);
@@ -175,7 +185,7 @@ class Level_1 extends Phaser.Scene {
             active: true,
             defaultKey: "cloud_enemy",
             maxSize: 5,
-            runChildUpdate: true
+            runChildUpdate: true,
             }
         );
 
@@ -195,34 +205,34 @@ class Level_1 extends Phaser.Scene {
             let h = 4;
             for(let j = 0; j < 5; j++){
                 if (j > i){
-                    copy.points.unshift({x: 70 + h*160, y:this.cloud_y});
+                    copy.points.unshift({x: 70 + h*180, y:this.cloud_y});
                     h--;
                 } else if (j < i){
-                    copy.points.push({x: 70 + j*160, y:this.cloud_y});
+                    copy.points.push({x: 70 + j*180, y:this.cloud_y});
                 }
             }
-            copy.points.push({x: 70 + i*160, y:this.cloud_y});
-            copy.points.unshift({x: 70 + i*160, y:this.cloud_y}); 
+            copy.points.push({x: 70 + i*180, y:this.cloud_y});
+            copy.points.unshift({x: 70 + i*180, y:this.cloud_y}); 
             let follower = new Cloud_enemy(
                 this,
                 copy,
-                70 + i*160,
+                70 + i*180,
                 this.cloud_y,
                 "cloud_enemy"
             );
             follower.setScale(0.5);
-            my.sprite.crystal_enemies.add(follower, true);
+            my.sprite.cloud_enemies.add(follower, true);
             follower.makeActive();
         }
-
+        //  console.log(my.sprite.cloud_enemies);
         my.sprite.cloud_lightning = this.add.group({
-            active: true,
+            active: false,
             defaultKey: "lightning",
             maxSize: 10,
             runChildUpdate: true
             }
         );
-        my.sprite.cloud_lightning.createMultiple({
+        /*my.sprite.cloud_lightning.createMultiple({
             classType: Ice_bullet,
             active: false,
             key: my.sprite.cloud_lightning.defaultKey,
@@ -230,6 +240,7 @@ class Level_1 extends Phaser.Scene {
         });
         my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
         my.sprite.ice_bullets.setXY(-100, -100);
+        */
         //======================================================
         // Game over text
         this.gameOver = this.add.bitmapText(game.config.width/2, game.config.height/2, 'text', 'Game Over', 32).setOrigin(0.5);
@@ -241,7 +252,7 @@ class Level_1 extends Phaser.Scene {
             if (this.playerHealth < 1){
                 this.reset();
             }
-        })
+        });
     }
     update(){   
         let my = this.my;
@@ -303,7 +314,9 @@ class Level_1 extends Phaser.Scene {
                 if (bullet.active){
                     if (this.collides(bullet, my.sprite.player)){
                         bullet.makeInactive();
-                        this.playerHealth--;
+                        if (!(this.godMode)){
+                            this.playerHealth--;
+                        }
                         console.log("Lost 1 health");
                     }
                 }

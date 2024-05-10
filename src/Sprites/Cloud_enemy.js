@@ -10,12 +10,12 @@ class Cloud_enemy extends Phaser.GameObjects.PathFollower {
     makeActive() {
         this.visible = true;
         this.active = true;
-        console.log(this.path);
+        console.log("Cloud activated!");
         this.startFollow({
             delay: 0,
             duration: 6000,
             repeat: -1,
-            yoyo: false,
+            yoyo: false
         });
     }
     makeInactive() {
