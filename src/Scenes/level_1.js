@@ -31,6 +31,13 @@ class Level_1 extends Phaser.Scene {
         this.load.image("star1", "star1.png");
         this.load.image("star2", "star2.png");
         this.load.image("star3", "star3.png");
+
+        this.load.image("yellowZap1", "lighting_yellow.png");
+        this.load.image("yellowZap2", "lighting_yellow_stretched.png");
+        this.load.image("yellowZap3", "lighting_yellow_stretched_more.png");
+        this.load.image("blueZap1", "lighting_blue.png");
+        this.load.image("blueZap2", "lighting_blue_stretched.png");
+        this.load.image("blueZap3", "lighting_blue_stretched_more.png");
     }
     create(){
         let my = this.my;
@@ -232,8 +239,23 @@ class Level_1 extends Phaser.Scene {
             runChildUpdate: true
             }
         );
+
+        this.anims.create({
+            key: "zap",
+            frames: [
+                { key: "yellowZap1" },
+                { key: "blueZap2" },
+                { key: "yellowZap3" },
+                { key: "blueZap3" },
+                { key: "yellowZap2" },
+                { key: "blueZap1" },
+            ],
+            framerate: 5,
+            repeat: 0,
+            hideOnComplete: true
+        });
         /*my.sprite.cloud_lightning.createMultiple({
-            classType: Ice_bullet,
+            classType: Lightning,
             active: false,
             key: my.sprite.cloud_lightning.defaultKey,
             repeat: my.sprite.cloud_lightning.maxSize-1
@@ -289,8 +311,6 @@ class Level_1 extends Phaser.Scene {
                     my.sprite.heart3_full.visible = false;
                     my.sprite.heart3_half.visible = true;
                     break;
-                default:
-                    console.log("You full health (i think)");
             }
             //Spawn bullets where the player presses space
             my.sprite.playerBullets.spawn(my.sprite.player.x, my.sprite.player.y);
@@ -302,9 +322,7 @@ class Level_1 extends Phaser.Scene {
                 if (bullet.active){
                     let hit = this.check_hit_enemy(bullet, my.sprite.crystal_enemies);
                     if (hit == null){
-                        console.log("Bullet still flying");
-                        //this.enemy_shot(bullet, my.sprite.crystal_enemies);
-                        //Now check to see if it hit the clouds
+                        this.check_hit_enemy(bullet, my.sprite.cloud_enemies);
                     }
                 }
             }
@@ -336,6 +354,20 @@ class Level_1 extends Phaser.Scene {
              this.iceCounter = 0;
             }
             this.iceCounter++;
+            for (let cloud of my.sprite.cloud_enemies.getChildren()){
+                if (cloud.active){
+                    if (cloud.counter >= cloud.shoot){
+                        let zap = my.sprite.cloud_lightning.getFirstDead();
+                        if (zap != null){
+                            zap.makeActive(cloud.x, cloud.y);
+                            zap.play("zap");
+                        }
+                        cloud.counter = 0;
+                        cloud.shoot = Phaser.Math.Between(0, 10);
+                    }
+                    cloud.counter++;
+                }
+            }
         }
     }
     check_hit_enemy(bullet, enemygroup){
