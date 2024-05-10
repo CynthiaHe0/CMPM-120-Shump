@@ -3,7 +3,7 @@ class Cloud_enemy extends Phaser.GameObjects.PathFollower {
         super(scene, path, x, y, texture, frame);
         this.visible = false;
         this.active = false;
-        this.shoot = Phaser.Math.Between(0, 10);
+        this.shoot = Phaser.Math.Between(10, 60);
         this.counter = 0;
         console.log("Cloud enemy created");
         return this;

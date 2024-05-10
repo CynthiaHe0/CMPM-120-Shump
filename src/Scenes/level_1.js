@@ -233,10 +233,10 @@ class Level_1 extends Phaser.Scene {
         }
         //  console.log(my.sprite.cloud_enemies);
         my.sprite.cloud_lightning = this.add.group({
-            active: false,
+            active: true,
             defaultKey: "blueZap1",
             maxSize: 10,
-            runChildUpdate: true
+            runChildUpdate: true,
             }
         );
         my.sprite.cloud_lightning.createMultiple({
@@ -245,8 +245,8 @@ class Level_1 extends Phaser.Scene {
             key: my.sprite.cloud_lightning.defaultKey,
             repeat: my.sprite.cloud_lightning.maxSize-1
         });
-        //my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
-        my.sprite.ice_bullets.setXY(game.config.height + 50, game.config.width + 50);
+
+        my.sprite.cloud_lightning.setXY(game.config.height + 50, game.config.width + 50);
         
         this.anims.create({
             key: "zap",
@@ -282,6 +282,9 @@ class Level_1 extends Phaser.Scene {
             my.sprite.heart3_empty.visible = true;
             for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
                 ice_enemy.makeInactive();
+            }
+            for (let cloud of my.sprite.cloud_enemies.getChildren()){
+                cloud.makeInactive();
             }
             //Maybe play animation of sun exploding
             this.gameOver.visible = true;
@@ -338,6 +341,18 @@ class Level_1 extends Phaser.Scene {
                     }
                 }
             }
+            //Check to see if any of the lightning hit the player
+            for (let zap of my.sprite.cloud_lightning.getChildren()){
+                if (zap.active){
+                    if (this.collides(zap, my.sprite.player)){
+                        zap.makeInactive();
+                        if (!(this.godMode)){
+                            this.playerHealth--;
+                        }
+                        console.log("zapped!");
+                    }
+                }
+            }
 
             //Have the ice enemies shoot bullets at a set interval of time
             if (this.iceCounter >= this.iceBulletCooldown){
@@ -355,14 +370,15 @@ class Level_1 extends Phaser.Scene {
             this.iceCounter++;
             for (let cloud of my.sprite.cloud_enemies.getChildren()){
                 if (cloud.active){
+                    this.children.bringToTop(cloud);
                     if (cloud.counter >= cloud.shoot){
                         let zap = my.sprite.cloud_lightning.getFirstDead();
                         if (zap != null){
-                            zap.makeActive(cloud.x, cloud.y);
-                            zap.play("zap");
+                            zap.makeActive(cloud.x);
+                            zap.play("zap").setScale(1, 1.5);
                         }
                         cloud.counter = 0;
-                        cloud.shoot = Phaser.Math.Between(0, 10);
+                        cloud.shoot = Phaser.Math.Between(10, 60);
                     }
                     cloud.counter++;
                 }
@@ -393,6 +409,13 @@ class Level_1 extends Phaser.Scene {
             ice_enemy.x = 70 + i*160;
             ice_enemy.y = this.crystal_y;
             ice_enemy.makeActive();
+            i++;
+        }
+        i = 0;
+        for (let cloud of this.my.sprite.cloud_enemies.getChildren()){
+            cloud.x = 70 + i*180;
+            cloud.y = this.cloud_y;
+            cloud.makeActive();
             i++;
         }
         this.my.sprite.heart1_full.visible = true;
