@@ -18,7 +18,7 @@ class Level_1 extends Phaser.Scene {
         //Preload the images
         this.load.setPath("./assets");
         this.load.image("cloud_enemy", "cloud.png");
-        this.load.image("lighting", "lighting_blue.png");
+        //this.load.image("lighting", "lighting_blue.png");
         this.load.image("player", "sun1.png");
         this.load.image("crystal_enemy", "Ice_crystal.png");
         this.load.image("fireball", "flame.png");
@@ -234,12 +234,20 @@ class Level_1 extends Phaser.Scene {
         //  console.log(my.sprite.cloud_enemies);
         my.sprite.cloud_lightning = this.add.group({
             active: false,
-            defaultKey: "lightning",
+            defaultKey: "blueZap1",
             maxSize: 10,
             runChildUpdate: true
             }
         );
-
+        my.sprite.cloud_lightning.createMultiple({
+            classType: Lightning,
+            active: false,
+            key: my.sprite.cloud_lightning.defaultKey,
+            repeat: my.sprite.cloud_lightning.maxSize-1
+        });
+        //my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
+        my.sprite.ice_bullets.setXY(game.config.height + 50, game.config.width + 50);
+        
         this.anims.create({
             key: "zap",
             frames: [
@@ -254,15 +262,6 @@ class Level_1 extends Phaser.Scene {
             repeat: 0,
             hideOnComplete: true
         });
-        /*my.sprite.cloud_lightning.createMultiple({
-            classType: Lightning,
-            active: false,
-            key: my.sprite.cloud_lightning.defaultKey,
-            repeat: my.sprite.cloud_lightning.maxSize-1
-        });
-        my.sprite.ice_bullets.propertyValueSet("speed", this.enemyBulletSpeed);
-        my.sprite.ice_bullets.setXY(-100, -100);
-        */
         //======================================================
         // Game over text
         this.gameOver = this.add.bitmapText(game.config.width/2, game.config.height/2, 'text', 'Game Over', 32).setOrigin(0.5);

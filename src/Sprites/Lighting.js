@@ -21,7 +21,7 @@ class Lightning extends Phaser.GameObjects.Sprite{
     makeActive(x, y) {
         this.x = x;
         this.y = y;
-        this.visible = true;
+        //this.visible = true;
         this.active = true;
         console.log("lightning activated");
     }
@@ -30,7 +30,7 @@ class Lightning extends Phaser.GameObjects.Sprite{
         this.visible = false;
         this.active = false;
         this.x = game.config.height + 50;
-        this.y = game.config.height + 50;
+        this.y = game.config.width + 50;
         console.log("Lightning inactive now");
     }
 }
