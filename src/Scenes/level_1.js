@@ -1,3 +1,8 @@
+//Things to do to improve if extra time
+//When losing last hitpoint, add sun turning cold animation before
+//bringing to restart screen
+//Make lightning not go through top of cloud
+//Add animations for getting hit
 class Level_1 extends Phaser.Scene {
     constructor(){
         super("level_1");
@@ -13,6 +18,7 @@ class Level_1 extends Phaser.Scene {
         this.cloud_y = 80;
         this.playerHealth = 6;
         this.godMode = false;
+        this.yay = true;
     }
     preload(){
         //Preload the images
@@ -20,6 +26,8 @@ class Level_1 extends Phaser.Scene {
         this.load.image("cloud_enemy", "cloud.png");
         //this.load.image("lighting", "lighting_blue.png");
         this.load.image("player", "sun1.png");
+        this.load.image("sadPlayer", "spikeBall_2.png");
+        this.load.image("happyPlayer", "sun2.png");
         this.load.image("crystal_enemy", "Ice_crystal.png");
         this.load.image("fireball", "flame.png");
         this.load.image("ice", "laserBlue10.png");
@@ -38,6 +46,12 @@ class Level_1 extends Phaser.Scene {
         this.load.image("blueZap1", "lighting_blue.png");
         this.load.image("blueZap2", "lighting_blue_stretched.png");
         this.load.image("blueZap3", "lighting_blue_stretched_more.png");
+
+        this.load.audio("fire sound", "thrusterFire_003.ogg");
+        this.load.audio("lightning", "laserLarge_000.ogg");
+        this.load.audio("tink", "impactGlass_heavy_000.ogg");
+        this.load.audio("sadge", "jingles_NES00.ogg");
+        this.load.audio("yay", "kids-saying-yay!-made-with-Voicemod.mp3");
     }
     create(){
         let my = this.my;
@@ -84,7 +98,10 @@ class Level_1 extends Phaser.Scene {
         my.sprite.heart3_empty.setScale(2);
         my.sprite.heart3_empty.visible = false;
 
-
+        my.sprite.sadPlayer = this.add.image(game.config.width/2, game.config.height - 100, "sadPlayer");
+        my.sprite.sadPlayer.visible = false;
+        my.sprite.happyPlayer = this.add.image(game.config.width/2, game.config.height - 100, "happyPlayer");
+        my.sprite.happyPlayer.visible = false;
         my.sprite.player = new Player(this, game.config.width/2, game.config.height - 40, "player", null,
         [this.left1, this.left2], [this.right1, this.right2], this.playerSpeed);
         my.sprite.player.setScale(0.5);
@@ -105,6 +122,10 @@ class Level_1 extends Phaser.Scene {
         my.sprite.playerBullets.propertyValueSet("speed", this.playerBulletSpeed);
         my.sprite.playerBullets.add_trigger_n_cooldown(this.space, this.playerBulletCooldown);
         my.sprite.playerBullets.setXY(-100, -100);
+        let fire_sound = this.sound.add("fire sound");
+        for (let pew of my.sprite.playerBullets.getChildren()){
+            pew.addSound(fire_sound);
+        }
         
         //THIS ONE LINE OF CODE MAKES THE ENTIRE CUSTOM GROUP WORK
         //AND ALLOWS FOR CHILD UPDATES!!!!!
@@ -266,6 +287,8 @@ class Level_1 extends Phaser.Scene {
         // Game over text
         this.gameOver = this.add.bitmapText(game.config.width/2, game.config.height/2, 'text', 'Game Over', 32).setOrigin(0.5);
         this.gameOver.visible = false;
+        this.youWin = this.add.bitmapText(game.config.width/2, game.config.height/2, 'text', 'You win!', 32).setOrigin(0.5);
+        this.youWin.visible = false;
         this.restartText = this.add.bitmapText(game.config.width/2, (game.config.height/2) + 20, 'text', 'Press R to restart', 32).setOrigin(0.5);
         this.restartText.visible = false;
         this.restartKey = this.input.keyboard.addKey("R");
@@ -280,6 +303,8 @@ class Level_1 extends Phaser.Scene {
         if (this.playerHealth < 1){
             my.sprite.heart3_half.visible = false;
             my.sprite.heart3_empty.visible = true;
+            my.sprite.player.visible = false;
+            my.sprite.sadPlayer.visible = true;
             for (let ice_enemy of my.sprite.crystal_enemies.getChildren()){
                 ice_enemy.makeInactive();
             }
@@ -289,9 +314,18 @@ class Level_1 extends Phaser.Scene {
             //Maybe play animation of sun exploding
             this.gameOver.visible = true;
             this.restartText.visible = true;
-            console.log("You ded now");
+            
             //this.pause()
-        } else{
+        } else if (this.all_enemies_ded()){
+            my.sprite.player.visible = false;
+            my.sprite.happyPlayer.visible = true;
+            this.youWin.visible = true;
+            this.restartText.visible = true;
+            if (this.yay){
+                this.sound.play("yay");
+                this.yay = false;
+            }
+        }else{
             switch(this.playerHealth){
                 case 5:
                     my.sprite.heart1_full.visible = false;
@@ -334,8 +368,12 @@ class Level_1 extends Phaser.Scene {
                 if (bullet.active){
                     if (this.collides(bullet, my.sprite.player)){
                         bullet.makeInactive();
+                        this.sound.play("tink", {volume: 0.5});
                         if (!(this.godMode)){
                             this.playerHealth--;
+                            if(this.playerHealth < 1){
+                                this.sound.play("sadge");
+                            }
                         }
                         console.log("Lost 1 health");
                     }
@@ -348,6 +386,9 @@ class Level_1 extends Phaser.Scene {
                         zap.makeInactive();
                         if (!(this.godMode)){
                             this.playerHealth--;
+                            if(this.playerHealth < 1){
+                                this.sound.play("sadge");
+                            }
                         }
                         console.log("zapped!");
                     }
@@ -376,6 +417,7 @@ class Level_1 extends Phaser.Scene {
                         if (zap != null){
                             zap.makeActive(cloud.x);
                             zap.play("zap").setScale(1, 1.5);
+                            this.sound.play("lightning", {volume: 0.4});
                         }
                         cloud.counter = 0;
                         cloud.shoot = Phaser.Math.Between(10, 60);
@@ -403,6 +445,19 @@ class Level_1 extends Phaser.Scene {
         if (Math.abs(a.y - b.y) > (a.displayHeight/2 + b.displayHeight/2)) return false;
         return true;
     }
+    all_enemies_ded(){
+        for(let enemy of this.my.sprite.crystal_enemies.getChildren()){
+            if (enemy.active){
+                return false;
+            }
+        }
+        for(let enemy of this.my.sprite.cloud_enemies.getChildren()){
+            if (enemy.active){
+                return false;
+            }
+        }
+        return true;
+    }
     reset(){
         let i = 0;
         for (let ice_enemy of this.my.sprite.crystal_enemies.getChildren()){
@@ -424,8 +479,12 @@ class Level_1 extends Phaser.Scene {
         this.my.sprite.heart2_empty.visible = false;
         this.my.sprite.heart3_full.visible = true;
         this.my.sprite.heart3_empty.visible = false;
+        this.my.sprite.player.visible = true;
+        this.my.sprite.sadPlayer.visible = false;
+        this.my.sprite.happyPlayer.visible = false;
         this.gameOver.visible = false;
         this.restartText.visible = false;
+        this.yay = true;
         this.playerHealth = 6;
     }
 }

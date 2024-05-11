@@ -14,7 +14,11 @@ class Player_bullet extends Phaser.GameObjects.Sprite {
             }
         }
     }
+    addSound(soundEffect){
+        this.sound = soundEffect;
+    }
     makeActive() {
+        this.sound.play();
         this.visible = true;
         this.active = true; 
     }
